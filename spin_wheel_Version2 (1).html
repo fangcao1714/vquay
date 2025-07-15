@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>🌤️ Vòng quay bí mật</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    color: #fff;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #87ceeb, #4facfe);
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background: url('https://cdn.pixabay.com/photo/2017/08/30/01/05/clouds-2698158_1280.png') repeat-x;
+    background-size: cover;
+    animation: cloudsMove 60s linear infinite;
+    opacity: 0.4;
+  }
+  @keyframes cloudsMove {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  h1 {
+    margin-top: 20px;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+    position: relative;
+    z-index: 1;
+  }
+  .container {
+    position: relative;
+    width: 380px;
+    height: 380px;
+    margin: 50px auto;
+    z-index: 1;
+  }
+  #wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 12px solid rgba(255,255,255,0.8);
+    background: conic-gradient(
+      #ff7675 0deg 60deg,
+      #74b9ff 60deg 120deg,
+      #55efc4 120deg 180deg,
+      #ffeaa7 180deg 240deg,
+      #a29bfe 240deg 300deg,
+      #fd79a8 300deg 360deg
+    );
+    box-shadow: 0 0 30px rgba(255,255,255,0.6), 0 0 60px rgba(0,0,0,0.2);
+    transition: transform 4s cubic-bezier(0.25, 1, 0.3, 1);
+    position: relative;
+  }
+  .num {
+    position: absolute;
+    font-size: 26px;
+    font-weight: bold;
+    color: #2d3436;
+    text-shadow: 1px 1px 4px rgba(255,255,255,0.8);
+  }
+  .num1 { top: 10%; left: 50%; transform: translate(-50%, -50%); }
+  .num2 { top: 25%; left: 85%; transform: translate(-50%, -50%); }
+  .num3 { top: 75%; left: 85%; transform: translate(-50%, -50%); }
+  .num4 { top: 90%; left: 50%; transform: translate(-50%, -50%); }
+  .num5 { top: 75%; left: 15%; transform: translate(-50%, -50%); }
+  .num6 { top: 25%; left: 15%; transform: translate(-50%, -50%); }
+  #pointer {
+    width: 0; height: 0;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-bottom: 50px solid #ff3838;
+    margin: 0 auto;
+    filter: drop-shadow(0 0 6px rgba(255,0,0,0.6));
+    z-index: 2;
+  }
+  button {
+    padding: 12px 30px;
+    font-size: 22px;
+    background: linear-gradient(135deg, #ff6b6b, #f06595);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-top: 20px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 1;
+    position: relative;
+  }
+  button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+  }
+  #resultOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 42px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.7);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+  }
+  #resultOverlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* Mobile responsive */
+  @media (max-width: 500px) {
+    .container {
+      width: 95vw;
+      height: 95vw;
+      max-width: 350px;
+      max-height: 350px;
+    }
+    #resultOverlay {
+      font-size: 28px;
+      padding: 10px;
+    }
+    h1 { font-size: 1.3em; }
+  }
+</style>
+</head>
+<body>
+  <h1>🌈 Vòng quay bí mật trên bầu trời</h1>
+  <div id="pointer"></div>
+  <div class="container">
+    <div id="wheel">
+      <div class="num num1">1</div>
+      <div class="num num2">2</div>
+      <div class="num num3">3</div>
+      <div class="num num4">4</div>
+      <div class="num num5">5</div>
+      <div class="num num6">6</div>
+    </div>
+  </div>
+  <button onclick="spinWheel()">🎡 Quay ngay!</button>
+  <div id="resultOverlay"></div>
+  <script>
+    const messages = {
+      1: "🌸 Tôi nhớ bạn!",
+      2: "💫 Bạn thật tuyệt vời!",
+      3: "❤️ Mình thích bạn!",
+      4: "🌻 Hãy cười thật nhiều nhé!",
+      5: "🙏 Cảm ơn bạn!",
+      6: "🌟 Bạn rất quan trọng với mình!"
+    };
+    function spinWheel() {
+      const wheel = document.getElementById('wheel');
+      const overlay = document.getElementById('resultOverlay');
+      overlay.classList.remove('show');
+      overlay.textContent = '';
+      const randomSpin = 360 * 5 + Math.floor(Math.random() * 360);
+      wheel.style.transition = 'transform 4s cubic-bezier(0.25, 1, 0.3, 1)';
+      wheel.style.transform = `rotate(${randomSpin}deg)`;
+      setTimeout(() => {
+        const actualDeg = randomSpin % 360;
+        let sector = Math.floor(actualDeg / 60) + 1;
+        if (sector > 6) sector = 6;
+        const message = messages[sector];
+        overlay.textContent = message;
+        overlay.classList.add('show');
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
